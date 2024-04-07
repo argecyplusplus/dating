@@ -1,0 +1,108 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1712495274837-1
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: match_seq
+            startValue: 1
+  - changeSet:
+      id: 1712495274837-2
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: profile_seq
+            startValue: 1
+  - changeSet:
+      id: 1712495274837-3
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_matches
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: is_pair
+                  type: BOOLEAN
+              - column:
+                  name: profile1_id
+                  type: BIGINT
+              - column:
+                  name: profile2_id
+                  type: BIGINT
+            tableName: matches
+  - changeSet:
+      id: 1712495274837-4
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_profiles
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: age
+                  type: INT
+              - column:
+                  name: avatar
+                  type: VARCHAR(255)
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+              - column:
+                  name: gender
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: social_link
+                  type: VARCHAR(255)
+              - column:
+                  name: min_age
+                  type: INT
+              - column:
+                  name: max_age
+                  type: INT
+            tableName: profiles
+  - changeSet:
+      id: 1712495274837-5
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: profile1_id
+            baseTableName: matches
+            constraintName: FK_MATCHES_ON_PROFILE1
+            referencedColumnNames: id
+            referencedTableName: profiles
+  - changeSet:
+      id: 1712495274837-6
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: profile2_id
+            baseTableName: matches
+            constraintName: FK_MATCHES_ON_PROFILE2
+            referencedColumnNames: id
+            referencedTableName: profiles
+
