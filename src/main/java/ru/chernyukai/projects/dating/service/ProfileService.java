@@ -13,12 +13,14 @@ public interface ProfileService {
 
     Optional<Profile> getProfileById(Long id);
 
-    Profile createMyProfile();
-
-    Profile editMyProfile();
-
     Profile editProfileById(Long id, Profile editedProfile) throws AccessDeniedException;
 
     void deleteProfileById(Long id);
 
+    //MY PROFILE
+    Optional<Profile> getMyProfile();
+
+    Profile editOrCreateMyProfile(Profile newProfile);
+
+    void deleteMyProfile();
 }

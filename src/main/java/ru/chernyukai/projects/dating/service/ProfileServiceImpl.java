@@ -23,16 +23,20 @@ import java.util.Optional;
 public class ProfileServiceImpl implements ProfileService {
     ProfileRepository profileRepository;
 
-    boolean userIsAdmin (){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    private User getCurrentUser(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private boolean userIsAdmin (){
+        User user = getCurrentUser();
         return user.getAuthorities().stream()
                 .filter(authority -> authority instanceof UserAuthority)
                 .map(authority -> (UserAuthority) authority)
                 .anyMatch(UserAuthority.ADMIN::equals);
     }
 
-    boolean checkAccessToProfile(Profile profile){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    private boolean checkAccessToProfile(Profile profile){
+        User user = getCurrentUser();
 
         //Если зашел админ
         if (userIsAdmin()){
@@ -127,6 +131,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
+    @Override
     public void deleteProfileById(Long id) throws AccessDeniedException{
         Profile profile = profileRepository.getProfileById(id).get();
         if (userIsAdmin()){
@@ -138,17 +143,52 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-
+    //MY PROFILE
 
     @Override
-    public Profile createMyProfile() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        return null;
+    public Optional<Profile> getMyProfile(){
+        User user = getCurrentUser();
+        return profileRepository.getProfileByUser(user);
     }
 
     @Override
-    public Profile editMyProfile() {
-        return null;
+    public Profile editOrCreateMyProfile(Profile newProfile) {
+        User user = getCurrentUser();
+        Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
+
+        if (myProfileOptional.isPresent()){
+            Profile profile = myProfileOptional.get();
+            //Заменить анкету
+            Long oldId = profile.getId();
+            profileRepository.delete(profile);
+            newProfile.setId(oldId);
+            profileRepository.save(newProfile);
+        }
+        else{
+            //Создать новую
+            profileRepository.save(new Profile(
+                    null,
+                    newProfile.getName(),
+                    newProfile.getAge(),
+                    newProfile.getAvatar(),
+                    newProfile.getCity(),
+                    newProfile.getGender(),
+                    newProfile.getDescription(),
+                    newProfile.getSocialLink(),
+                    newProfile.getMinAge(),
+                    newProfile.getMaxAge(),
+                    user,
+                    newProfile.isVisible()
+            ));
+        }
+        return newProfile;
     }
+
+    @Override
+    public void deleteMyProfile(){
+        User user = getCurrentUser();
+        Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
+        myProfileOptional.ifPresent(profile -> profileRepository.delete(profile));
+    }
+
 }

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import ru.chernyukai.projects.dating.model.Profile;
+import ru.chernyukai.projects.dating.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +21,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long>, PagingA
 
     //get profile by id
     Optional<Profile> getProfileById(Long id);
+
+    //get profile by user
+    Optional<Profile> getProfileByUser(User user);
 }
