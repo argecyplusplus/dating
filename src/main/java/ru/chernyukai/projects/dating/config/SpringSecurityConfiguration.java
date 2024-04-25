@@ -25,9 +25,7 @@ public class SpringSecurityConfiguration {
                                 .requestMatchers("/registration", "/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/profiles").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/myprofile").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/myprofile").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/myprofile").permitAll()
+                                .requestMatchers("/myprofile").permitAll()
                                 .anyRequest().hasAuthority(UserAuthority.ADMIN.getAuthority()))
                 .formLogin(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable);

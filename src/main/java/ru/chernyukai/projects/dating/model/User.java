@@ -2,12 +2,14 @@ package ru.chernyukai.projects.dating.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
+@Accessors(chain = true)
 @AllArgsConstructor
 @RequiredArgsConstructor
 //@NoArgsConstructor
