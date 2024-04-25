@@ -37,7 +37,7 @@ public class ProfileController {
         }
     }
 
-    @GetMapping("/{id}")
+    @PutMapping("/{id}")
     ResponseEntity<Profile> editProfile (@PathVariable("id") Long id, @RequestBody Profile editedProfile){
 
         Optional<Profile> profileOptional = profileService.getProfileById(id);
@@ -55,7 +55,7 @@ public class ProfileController {
         }
     }
 
-    @GetMapping("/{id}")
+    @DeleteMapping("/{id}")
     ResponseEntity<Profile> deleteProfile (@PathVariable("id") Long id){
 
         Optional<Profile> profileOptional = profileService.getProfileById(id);
