@@ -8,11 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Accessors(chain = true)
+//@NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-//@NoArgsConstructor
 @Getter //Генерируем геттеры
 @Setter //Генерируем сеттеры
 @ToString
@@ -28,15 +29,27 @@ public class User implements UserDetails {
 
     private String password;
 
+    private boolean expired;
+    private boolean locked;
+    private boolean enabled;
+
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<UserRole> userRoles;
 
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return userRoles.stream().map(UserRole::getUserAuthority).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
     }
 
     @Override
@@ -58,4 +71,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
+
+
 }

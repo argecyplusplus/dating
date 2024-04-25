@@ -24,7 +24,14 @@ public class UserServiceImpl implements UserService{
     public void registration(String username, String password) throws UsernameAlreadyExistsException {
         if (userRepository.findByUsername(username).isEmpty()) {
             User user = userRepository.save(
-                    new User(null, username, passwordEncoder.encode(password), null)
+                    new User()
+                            .setId(null)
+                            .setUsername(username)
+                            .setPassword(passwordEncoder.encode(password))
+                            .setLocked(false)
+                            .setExpired(false)
+                            .setEnabled(true)
+
             );
             userRolesRepository.save(new UserRole(null, UserAuthority.DEFAULT_USER, user));
         }

@@ -10,7 +10,7 @@ import ru.chernyukai.projects.dating.service.UserService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/registration")
+@RequestMapping("/reg")
 public class RegistrationController {
     private final UserService userService;
 

@@ -22,7 +22,7 @@ public class SpringSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(expressionInterceptUrlRegistry ->
                         expressionInterceptUrlRegistry
-                                .requestMatchers("/registration", "/login").permitAll()
+                                .requestMatchers("/reg", "/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/profiles").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll()
                                 .requestMatchers("/myprofile").permitAll()

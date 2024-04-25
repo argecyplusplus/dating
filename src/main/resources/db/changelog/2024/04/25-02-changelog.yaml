@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1714056889487-1
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+              - column:
+                  name: expired
+                  type: BOOLEAN
+              - column:
+                  name: locked
+                  type: BOOLEAN
+            tableName: users
+  - changeSet:
+      id: 1714056889487-2
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: enabled
+            tableName: users
+  - changeSet:
+      id: 1714056889487-4
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: expired
+            tableName: users
+  - changeSet:
+      id: 1714056889487-6
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: locked
+            tableName: users
+
