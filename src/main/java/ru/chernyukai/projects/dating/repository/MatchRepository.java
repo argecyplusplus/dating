@@ -7,6 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import ru.chernyukai.projects.dating.model.Match;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MatchRepository extends JpaRepository<Match, Long>, PagingAndSortingRepository<Match, Long> {
     //get all matches (paging)
@@ -18,4 +19,6 @@ public interface MatchRepository extends JpaRepository<Match, Long>, PagingAndSo
 
     @Query(value="select * from matches where isPair=false and (person2=id)", nativeQuery = true)
     List<Match> getAllMatchesByProfileId(Long id);
+
+    Optional<Match> getMatchById(Long id);
 }

@@ -53,4 +53,10 @@ public class Profile {
     @Column(name="max_age")
     private int maxAge;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name="is_visible")
+    private boolean isVisible;
 }

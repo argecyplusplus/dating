@@ -1,19 +1,24 @@
 package ru.chernyukai.projects.dating.service;
 
+import org.springframework.security.access.AccessDeniedException;
 import ru.chernyukai.projects.dating.model.Profile;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ProfileService {
 
-    List<Profile> getAllProfiles(int page);
+    Page<Profile> getAllProfiles(int page);
 
-    Optional<Profile> getProfileById();
+    Optional<Profile> getProfileById(Long id);
 
     Profile createMyProfile();
 
     Profile editMyProfile();
 
+    Profile editProfileById(Long id, Profile editedProfile) throws AccessDeniedException;
+
+    void deleteProfileById(Long id);
 
 }

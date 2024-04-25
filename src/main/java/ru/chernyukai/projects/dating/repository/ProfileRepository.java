@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface ProfileRepository extends JpaRepository<Profile, Long>, PagingAndSortingRepository<Profile, Long>{
     //get all profiles (paging)
-    List<Profile> getProfilesBy(PageRequest pageRequest);
+    List<Profile> getProfilesBy();
 
     //get random profile
     @Query(value = "select * from profiles orger by random() limit 1", nativeQuery = true)
