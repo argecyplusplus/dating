@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import ru.chernyukai.projects.dating.model.Profile;
+import ru.chernyukai.projects.dating.model.ProfileInfo;
 import ru.chernyukai.projects.dating.service.ProfileService;
 
 import java.util.List;
@@ -20,15 +21,15 @@ public class ProfileController {
 
     //ВСЕ АНКЕТЫ
     @GetMapping
-    public ResponseEntity<Page<Profile>> getAllProfiles(@RequestParam("page") int page){
+    public ResponseEntity<Page<ProfileInfo>> getAllProfiles(@RequestParam("page") int page){
         return ResponseEntity.ok(profileService.getAllProfiles(page));
     }
 
     //КОНКРЕТНАЯ АНКЕТА
     @GetMapping("/{id}")
-    ResponseEntity<Profile> getProfile (@PathVariable("id") Long id){
+    ResponseEntity<ProfileInfo> getProfile (@PathVariable("id") Long id){
 
-        Optional<Profile> profileOptional = profileService.getProfileById(id);
+        Optional<ProfileInfo> profileOptional = profileService.getProfileById(id);
         if (profileOptional.isPresent()){
             return ResponseEntity.ok(profileOptional.get());
         }
@@ -38,16 +39,16 @@ public class ProfileController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Profile> editProfile (@PathVariable("id") Long id, @RequestBody Profile editedProfile){
+    ResponseEntity<ProfileInfo> editProfile (@PathVariable("id") Long id, @RequestBody ProfileInfo editedProfile){
 
-        Optional<Profile> profileOptional = profileService.getProfileById(id);
+        Optional<ProfileInfo> profileOptional = profileService.getProfileById(id);
         if (profileOptional.isPresent()) {
             try{
-                Profile newProfile = profileService.editProfileById(id, editedProfile);
+                ProfileInfo newProfile = profileService.editProfileById(id, editedProfile);
                 return ResponseEntity.ok(newProfile);
             }
             catch (AccessDeniedException e){
-                return (ResponseEntity<Profile>) ResponseEntity.status(403);
+                return (ResponseEntity<ProfileInfo>) ResponseEntity.status(403);
             }
         }
         else {
@@ -56,16 +57,16 @@ public class ProfileController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Profile> deleteProfile (@PathVariable("id") Long id){
+    ResponseEntity<ProfileInfo> deleteProfile (@PathVariable("id") Long id){
 
-        Optional<Profile> profileOptional = profileService.getProfileById(id);
+        Optional<ProfileInfo> profileOptional = profileService.getProfileById(id);
         if (profileOptional.isPresent()) {
             try{
                 profileService.deleteProfileById(id);
                 return ResponseEntity.ok().build();
             }
             catch (AccessDeniedException e){
-                return (ResponseEntity<Profile>) ResponseEntity.status(403);
+                return (ResponseEntity<ProfileInfo>) ResponseEntity.status(403);
             }
         }
         else {

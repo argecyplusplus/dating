@@ -23,7 +23,7 @@ public class SpringSecurityConfiguration {
         http.authorizeHttpRequests(expressionInterceptUrlRegistry ->
                         expressionInterceptUrlRegistry
                                 .requestMatchers("/reg", "/login").permitAll() // разрешить всем регистрацию
-                                .requestMatchers("/").permitAll() // разрешить всем домашнюю страницу
+                                .requestMatchers(HttpMethod.GET,"/").permitAll() // разрешить всем домашнюю страницу
                                 .requestMatchers(HttpMethod.GET, "/profiles").permitAll() //профили обычных юзеров только на чтение
                                 .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll() //конкретный профиль только на чтение
                                 .requestMatchers("/myprofile").permitAll() //для своего профиля полный доступ

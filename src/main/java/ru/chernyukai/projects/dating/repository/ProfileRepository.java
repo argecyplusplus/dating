@@ -15,6 +15,8 @@ public interface ProfileRepository extends JpaRepository<Profile, Long>, PagingA
     //get all profiles (paging)
     List<Profile> getProfilesBy();
 
+    List<Profile> findProfilesBy();
+
     //get random profile
     @Query(value = "select * from profiles orger by random() limit 1", nativeQuery = true)
     Profile getRandomProfile ();
