@@ -22,11 +22,12 @@ public class SpringSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(expressionInterceptUrlRegistry ->
                         expressionInterceptUrlRegistry
-                                .requestMatchers("/reg", "/login").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/profiles").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll()
-                                .requestMatchers("/myprofile").permitAll()
-                                .anyRequest().hasAuthority(UserAuthority.ADMIN.getAuthority()))
+                                .requestMatchers("/reg", "/login").permitAll() // разрешить всем регистрацию
+                                .requestMatchers("/").permitAll() // разрешить всем домашнюю страницу
+                                .requestMatchers(HttpMethod.GET, "/profiles").permitAll() //профили обычных юзеров только на чтение
+                                .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll() //конкретный профиль только на чтение
+                                .requestMatchers("/myprofile").permitAll() //для своего профиля полный доступ
+                                .anyRequest().hasAuthority(UserAuthority.ADMIN.getAuthority())) //админам можно всё
                 .formLogin(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable);
 
@@ -35,7 +36,7 @@ public class SpringSecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(10);
     }
 
 }
