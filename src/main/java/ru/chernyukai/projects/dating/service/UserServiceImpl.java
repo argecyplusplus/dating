@@ -1,7 +1,9 @@
 package ru.chernyukai.projects.dating.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,12 +14,18 @@ import ru.chernyukai.projects.dating.model.UserRole;
 import ru.chernyukai.projects.dating.repository.UserRepository;
 import ru.chernyukai.projects.dating.repository.UserRolesRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRolesRepository userRolesRepository;
     private final UserRepository userRepository;
+
+    @Autowired
     private final PasswordEncoder passwordEncoder;
+
 
 
     @Override
