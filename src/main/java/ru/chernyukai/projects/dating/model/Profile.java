@@ -16,9 +16,8 @@ import lombok.*;
 public class Profile {
 
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_seq")
-    @SequenceGenerator(name = "profile_seq", sequenceName = "profile_seq", initialValue = 1, allocationSize = 1)
+    @SequenceGenerator(name = "profile_id_seq", sequenceName = "profile_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_id_seq")
     private Long id;
 
     @Column(name="name")
@@ -29,7 +28,6 @@ public class Profile {
     private int age;
 
     @Column(name="avatar")
-    @Nonnull
     private String avatar;
 
     @Column(name="city")

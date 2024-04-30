@@ -216,6 +216,7 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setGender(newProfile.getGender());
             profile.setDescription(newProfile.getDescription());
             profile.setSocialLink(newProfile.getSocialLink());
+            profileRepository.save(profile);
         }
         else{
             //Создать новую
@@ -233,6 +234,7 @@ public class ProfileServiceImpl implements ProfileService {
                     user,
                     true
             );
+
 
             profileRepository.save(profile);
         }
