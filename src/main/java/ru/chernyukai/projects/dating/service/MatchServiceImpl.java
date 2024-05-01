@@ -28,6 +28,27 @@ public class MatchServiceImpl implements MatchService{
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
+    private boolean checkAccessToMatch (Long matchId){
+        User user = getCurrentUser();
+
+        Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
+
+        if (myProfileOptional.isEmpty()){
+            return false;
+        }
+
+        Profile myProfile = myProfileOptional.get();
+
+        Match match = matchRepository.getMatchById(matchId).get();
+
+        Profile profile1 = match.getProfile1();
+        Profile profile2 = match.getProfile2();
+
+        return myProfile.getId().equals(profile1.getId())
+                || myProfile.getId().equals(profile2.getId());
+
+    }
+
     @Override
     public void sendLike (Long id){
         matchRepository.save(
@@ -55,7 +76,7 @@ public class MatchServiceImpl implements MatchService{
             for (Match match: myMatches){
                 Profile profile = match.getProfile1();
                 myMatchesProfiles.add(new ProfileInfo(
-                        profile.getId(),
+                        match.getId(),
                         profile.getName(),
                         profile.getAge(),
                         profile.getAvatar(),
@@ -106,6 +127,84 @@ public class MatchServiceImpl implements MatchService{
         return myPairsProfiles;
 
     }
-    
+
+    @Override
+    public Optional<ProfileInfo> getProfileFromMatch (Long matchId){
+        Optional<Match> matchOptional = matchRepository.getMatchById(matchId);
+        if (matchOptional.isPresent() && checkAccessToMatch(matchId)){
+            Match match = matchOptional.get();
+            Profile profile = match.getProfile1();
+
+            return Optional.of (
+                    new ProfileInfo(
+                            match.getId(),
+                            profile.getName(),
+                            profile.getAge(),
+                            profile.getAvatar(),
+                            profile.getCity(),
+                            profile.getGender(),
+                            profile.getDescription(),
+                            null
+
+                    )
+
+            );
+        }
+        else{
+            return Optional.empty();
+        }
+    }
+
+
+    @Override
+    public Optional<ProfileInfo> getProfileFromPair (Long matchId){
+        Optional<Match> matchOptional = matchRepository.getMatchById(matchId);
+        if (matchOptional.isPresent() && checkAccessToMatch(matchId)){
+            Match match = matchOptional.get();
+            Profile profile;
+
+            User user = getCurrentUser();
+            Profile myProfile = profileRepository.getProfileByUser(user).get();
+
+
+            if (match.getProfile1().getId().equals(myProfile.getId())){
+                profile = match.getProfile2();
+            }
+            else{
+                profile = match.getProfile1();
+            }
+
+            return Optional.of(
+                    new ProfileInfo(
+                            match.getId(),
+                            profile.getName(),
+                            profile.getAge(),
+                            profile.getAvatar(),
+                            profile.getCity(),
+                            profile.getGender(),
+                            profile.getDescription(),
+                            profile.getSocialLink()
+
+                    )
+            );
+
+        }
+        else{
+            return Optional.empty();
+        }
+
+    }
+
+    @Override
+    public void createPair(Long matchId) {
+        Match match = matchRepository.getMatchById(matchId).get();
+        match.setPair(true);
+        matchRepository.save(match);
+    }
+
+    @Override
+    public void deleteMatch(Long matchId) {
+        matchRepository.deleteById(matchId);
+    }
 
 }

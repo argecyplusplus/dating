@@ -81,8 +81,13 @@ public class ProfileController {
     //Отправить лайк
     @PostMapping("/{id}")
     ResponseEntity<ProfileInfo> deleteProfile (@PathVariable("id") Long id, @RequestParam("action") String action){
-        matchService.sendLike(id);
-        return ResponseEntity.ok().build();
+        if (action.equals("like")) {
+            matchService.sendLike(id);
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 
