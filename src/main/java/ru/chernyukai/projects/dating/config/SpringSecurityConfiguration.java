@@ -24,9 +24,9 @@ public class SpringSecurityConfiguration {
                         expressionInterceptUrlRegistry
                                 .requestMatchers("/reg", "/login").permitAll() // разрешить всем регистрацию
                                 .requestMatchers(HttpMethod.GET,"/").permitAll() // разрешить всем домашнюю страницу
-                                .requestMatchers(HttpMethod.GET, "/profiles").permitAll() //профили обычных юзеров только на чтение
-                                .requestMatchers(HttpMethod.GET, "/profiles/**").permitAll() //конкретный профиль только на чтение
-                                .requestMatchers("/myprofile").permitAll() //для своего профиля полный доступ
+                                .requestMatchers(HttpMethod.GET, "/profiles").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority()) //профили обычных юзеров только на чтение
+                                .requestMatchers(HttpMethod.GET, "/profiles/**").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority()) //конкретный профиль только на чтение
+                                .requestMatchers("/myprofile").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority()) //для своего профиля полный доступ
                                 .anyRequest().hasAuthority(UserAuthority.ADMIN.getAuthority())) //админам можно всё
                 .formLogin(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable);
