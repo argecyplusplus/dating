@@ -45,12 +45,6 @@ public class Profile {
     @Nonnull
     private String socialLink;
 
-    @Column(name="min_age")
-    private int minAge;
-
-    @Column(name="max_age")
-    private int maxAge;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ProfileService {
 
-    Page<ProfileInfo> getAllProfiles(int page);
+    Page<ProfileInfo> getAllProfiles(int page, int minAge, int maxAge);
 
     Optional<ProfileInfo> getProfileById(Long id);
 
@@ -24,4 +24,5 @@ public interface ProfileService {
     ProfileInfo editOrCreateMyProfile(ProfileInfo newProfile);
 
     void deleteMyProfile();
+
 }

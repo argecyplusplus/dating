@@ -8,6 +8,7 @@ import lombok.*;
 @Setter //Генерируем сеттеры
 @ToString
 public class ProfileInfo {
+    private Long id;
     private String name;
     private int age;
     private String avatar;

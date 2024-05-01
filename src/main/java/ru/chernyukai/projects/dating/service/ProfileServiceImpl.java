@@ -38,7 +38,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .anyMatch(UserAuthority.ADMIN::equals);
     }
 
-    private boolean checkAccessToProfile(Profile profile){
+    private boolean checkAccessToProfile(Profile profile) {
         User user = getCurrentUser();
 
         //Если зашел админ
@@ -78,6 +78,7 @@ public class ProfileServiceImpl implements ProfileService {
             return false;
         }
 
+
         //Подумать тут про увлечения
 
         return true;
@@ -85,22 +86,27 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    public Page<ProfileInfo> getAllProfiles(int page) {
+    public Page<ProfileInfo> getAllProfiles(int page, int minAge, int maxAge) {
         List<Profile> allProfiles = profileRepository.findProfilesBy();
 
         List<ProfileInfo> allowedProfiles = new ArrayList<>();
 
+
         for (Profile profile: allProfiles){
             if (checkAccessToProfile(profile)){
-                allowedProfiles.add(new ProfileInfo(
-                        profile.getName(),
-                        profile.getAge(),
-                        profile.getAvatar(),
-                        profile.getCity(),
-                        profile.getGender(),
-                        profile.getDescription(),
-                        profile.getSocialLink()
-                ));
+                if (minAge <= profile.getAge() && profile.getAge()<=maxAge)
+                {
+                    allowedProfiles.add(new ProfileInfo(
+                            profile.getId(),
+                            profile.getName(),
+                            profile.getAge(),
+                            profile.getAvatar(),
+                            profile.getCity(),
+                            profile.getGender(),
+                            profile.getDescription(),
+                            null
+                    ));
+                }
             }
         }
 
@@ -119,13 +125,14 @@ public class ProfileServiceImpl implements ProfileService {
             Profile profile = profileOptional.get();
             if (checkAccessToProfile(profile)){
                 return Optional.of(new ProfileInfo(
+                        profile.getId(),
                         profile.getName(),
                         profile.getAge(),
                         profile.getAvatar(),
                         profile.getCity(),
                         profile.getGender(),
                         profile.getDescription(),
-                        profile.getSocialLink()
+                        null
                 ));
             }
             else {
@@ -149,8 +156,9 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setGender(editedProfile.getGender());
             profile.setDescription(editedProfile.getDescription());
             profile.setSocialLink(editedProfile.getSocialLink());
-
+            profileRepository.save(profile);
             return new ProfileInfo(
+                    profile.getId(),
                     profile.getName(),
                     profile.getAge(),
                     profile.getAvatar(),
@@ -186,6 +194,7 @@ public class ProfileServiceImpl implements ProfileService {
         if (myProfileOptional.isPresent()){
             Profile myProfile =  myProfileOptional.get();
             return Optional.of(new ProfileInfo(
+                    myProfile.getId(),
                     myProfile.getName(),
                     myProfile.getAge(),
                     myProfile.getAvatar(),
@@ -229,8 +238,6 @@ public class ProfileServiceImpl implements ProfileService {
                     newProfile.getGender(),
                     newProfile.getDescription(),
                     newProfile.getSocialLink(),
-                    18,
-                    100,
                     user,
                     true
             );
@@ -239,6 +246,7 @@ public class ProfileServiceImpl implements ProfileService {
             profileRepository.save(profile);
         }
         return new ProfileInfo(
+                profile.getId(),
                 profile.getName(),
                 profile.getAge(),
                 profile.getAvatar(),

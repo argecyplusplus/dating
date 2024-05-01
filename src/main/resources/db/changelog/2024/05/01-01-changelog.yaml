@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1714553468174-1
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: max_age
+            tableName: profiles
+        - dropColumn:
+            columnName: min_age
+            tableName: profiles
+

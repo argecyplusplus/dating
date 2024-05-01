@@ -13,12 +13,13 @@ public interface MatchRepository extends JpaRepository<Match, Long>, PagingAndSo
     //get all matches (paging)
     List<Match> getMatchesBy(PageRequest pageRequest);
 
-    //get all matches by profile
-    @Query(value="select * from matches where isPair=true and (person1=id or person2=id)", nativeQuery = true)
-    List<Match> getAllPairsByProfileId(Long id);
+    //get pairs with user
+    @Query(value="select * from matches where isPair=true and (person1=profileId or person2=profileId)", nativeQuery = true)
+    List<Match> getAllPairsByProfileId(Long profileId);
 
-    @Query(value="select * from matches where isPair=false and (person2=id)", nativeQuery = true)
-    List<Match> getAllMatchesByProfileId(Long id);
+    //get received matches
+    @Query(value="select * from matches where isPair=false and (person2=profileId)", nativeQuery = true)
+    List<Match> getAllMatchesByProfileId(Long profileId);
 
     Optional<Match> getMatchById(Long id);
 }
