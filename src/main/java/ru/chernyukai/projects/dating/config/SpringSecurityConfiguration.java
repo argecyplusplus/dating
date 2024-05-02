@@ -26,6 +26,16 @@ public class SpringSecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET,"/").permitAll() // разрешить всем домашнюю страницу
                                 .requestMatchers(HttpMethod.GET, "/profiles").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority()) //профили обычных юзеров только на чтение
                                 .requestMatchers(HttpMethod.GET, "/profiles/**").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority()) //конкретный профиль только на чтение
+                                .requestMatchers(HttpMethod.POST, "/profiles/**").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority()) // взаимодействие с анкетами
+
+                                .requestMatchers( HttpMethod.GET, "/matches/").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority())
+                                .requestMatchers( HttpMethod.GET, "/matches/**").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority())
+                                .requestMatchers( HttpMethod.POST, "/matches/**").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority())
+
+                                .requestMatchers( HttpMethod.GET, "/pairs/").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority())
+                                .requestMatchers( HttpMethod.GET, "/pairs/**").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority())
+
+
                                 .requestMatchers("/myprofile").hasAuthority(UserAuthority.DEFAULT_USER.getAuthority()) //для своего профиля полный доступ
                                 .anyRequest().hasAuthority(UserAuthority.ADMIN.getAuthority())) //админам можно всё
                 .formLogin(Customizer.withDefaults())

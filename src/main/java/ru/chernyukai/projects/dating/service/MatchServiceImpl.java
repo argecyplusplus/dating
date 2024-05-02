@@ -51,13 +51,34 @@ public class MatchServiceImpl implements MatchService{
 
     @Override
     public void sendLike (Long id){
+
+        Profile sender = profileRepository.getProfileByUser(getCurrentUser()).get();
+        Profile receiver = profileRepository.getProfileById(id).get();
+
+        if (
+                matchRepository.getMatchByProfile1AndProfile2(sender, receiver).isPresent()
+        ){
+            return;
+        }
+
+        if (
+                matchRepository.getMatchByProfile1AndProfile2(receiver, sender).isPresent()
+        ){
+            Match match = matchRepository.getMatchByProfile1AndProfile2(receiver, sender).get();
+            if (!match.isPair()){
+                match.setPair(true);
+            }
+            matchRepository.save(match);
+            return;
+        }
+
         matchRepository.save(
-            new Match(
-                    null,
-                    false,
-                    profileRepository.getProfileByUser(getCurrentUser()).get(),
-                    profileRepository.getProfileById(id).get()
-            )
+                new Match(
+                        null,
+                        false,
+                        sender,
+                        receiver
+                )
         );
     }
 

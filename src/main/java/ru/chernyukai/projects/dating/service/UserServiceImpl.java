@@ -26,8 +26,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private final PasswordEncoder passwordEncoder;
 
-
-
     @Override
     public void registration(String username, String password) throws UsernameAlreadyExistsException {
         if (userRepository.findByUsername(username).isEmpty()) {
