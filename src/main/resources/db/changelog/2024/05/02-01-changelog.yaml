@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1714643310260-1
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: interest_seq
+            startValue: 1
+  - changeSet:
+      id: 1714643310260-2
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: profile_photo_seq
+            startValue: 1
+  - changeSet:
+      id: 1714643310260-3
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_interests
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: profile_id
+                  type: BIGINT
+            tableName: interests
+  - changeSet:
+      id: 1714643310260-4
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_profile_photos
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: link
+                  type: VARCHAR(255)
+              - column:
+                  name: profile_id
+                  type: BIGINT
+            tableName: profile_photos
+  - changeSet:
+      id: 1714643310260-5
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: profile_id
+            baseTableName: interests
+            constraintName: FK_INTERESTS_ON_PROFILE
+            referencedColumnNames: id
+            referencedTableName: profiles
+  - changeSet:
+      id: 1714643310260-6
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: profile_id
+            baseTableName: profile_photos
+            constraintName: FK_PROFILE_PHOTOS_ON_PROFILE
+            referencedColumnNames: id
+            referencedTableName: profiles
+  - changeSet:
+      id: 1714643310260-7
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: avatar
+            tableName: profiles
+

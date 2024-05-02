@@ -4,6 +4,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
+import ru.chernyukai.projects.dating.model.ProfilePhoto;
+import ru.chernyukai.projects.dating.model.Interest;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -27,8 +31,8 @@ public class Profile {
     @Column(name="age")
     private int age;
 
-    @Column(name="avatar")
-    private String avatar;
+    @OneToMany(mappedBy = "profile", orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ProfilePhoto> photos;
 
     @Column(name="city")
     @Nonnull
@@ -37,6 +41,9 @@ public class Profile {
     @Column(name="gender")
     @Nonnull
     private String gender;
+
+    @OneToMany(mappedBy = "profile", orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Interest> interests;
 
     @Column(name="description")
     private String description;

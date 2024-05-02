@@ -100,9 +100,10 @@ public class MatchServiceImpl implements MatchService{
                         match.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getAvatar(),
+                        profile.getPhotos(),
                         profile.getCity(),
                         profile.getGender(),
+                        profile.getInterests(),
                         profile.getDescription(),
                         null
                 ));
@@ -136,9 +137,10 @@ public class MatchServiceImpl implements MatchService{
                         profile.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getAvatar(),
+                        profile.getPhotos(),
                         profile.getCity(),
                         profile.getGender(),
+                        profile.getInterests(),
                         profile.getDescription(),
                         profile.getSocialLink()
                 ));
@@ -161,9 +163,10 @@ public class MatchServiceImpl implements MatchService{
                             match.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getAvatar(),
+                            profile.getPhotos(),
                             profile.getCity(),
                             profile.getGender(),
+                            profile.getInterests(),
                             profile.getDescription(),
                             null
 
@@ -200,9 +203,10 @@ public class MatchServiceImpl implements MatchService{
                             match.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getAvatar(),
+                            profile.getPhotos(),
                             profile.getCity(),
                             profile.getGender(),
+                            profile.getInterests(),
                             profile.getDescription(),
                             profile.getSocialLink()
 

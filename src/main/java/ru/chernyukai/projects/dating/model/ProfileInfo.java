@@ -2,6 +2,8 @@ package ru.chernyukai.projects.dating.model;
 
 import lombok.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Getter //Генерируем геттеры
@@ -11,9 +13,10 @@ public class ProfileInfo {
     private Long id;
     private String name;
     private int age;
-    private String avatar;
+    private List<ProfilePhoto> photos;
     private String city;
     private String gender;
+    private List<Interest> interests;
     private String description;
     private String socialLink;
 }

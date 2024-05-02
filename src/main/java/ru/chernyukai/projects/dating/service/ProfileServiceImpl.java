@@ -100,9 +100,10 @@ public class ProfileServiceImpl implements ProfileService {
                             profile.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getAvatar(),
+                            profile.getPhotos(),
                             profile.getCity(),
                             profile.getGender(),
+                            profile.getInterests(),
                             profile.getDescription(),
                             null
                     ));
@@ -128,9 +129,10 @@ public class ProfileServiceImpl implements ProfileService {
                         profile.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getAvatar(),
+                        profile.getPhotos(),
                         profile.getCity(),
                         profile.getGender(),
+                        profile.getInterests(),
                         profile.getDescription(),
                         null
                 ));
@@ -151,7 +153,7 @@ public class ProfileServiceImpl implements ProfileService {
             //Заменить анкету
             profile.setName(editedProfile.getName());
             profile.setAge(editedProfile.getAge());
-            profile.setAvatar(editedProfile.getAvatar());
+            profile.setPhotos(editedProfile.getPhotos());
             profile.setCity(editedProfile.getCity());
             profile.setGender(editedProfile.getGender());
             profile.setDescription(editedProfile.getDescription());
@@ -161,9 +163,10 @@ public class ProfileServiceImpl implements ProfileService {
                     profile.getId(),
                     profile.getName(),
                     profile.getAge(),
-                    profile.getAvatar(),
+                    profile.getPhotos(),
                     profile.getCity(),
                     profile.getGender(),
+                    profile.getInterests(),
                     profile.getDescription(),
                     profile.getSocialLink()
             );
@@ -197,9 +200,10 @@ public class ProfileServiceImpl implements ProfileService {
                     myProfile.getId(),
                     myProfile.getName(),
                     myProfile.getAge(),
-                    myProfile.getAvatar(),
+                    myProfile.getPhotos(),
                     myProfile.getCity(),
                     myProfile.getGender(),
+                    myProfile.getInterests(),
                     myProfile.getDescription(),
                     myProfile.getSocialLink()
             ));
@@ -220,9 +224,10 @@ public class ProfileServiceImpl implements ProfileService {
             //Заменить анкету
             profile.setName(newProfile.getName());
             profile.setAge(newProfile.getAge());
-            profile.setAvatar(newProfile.getAvatar());
+            profile.setPhotos(newProfile.getPhotos());
             profile.setCity(newProfile.getCity());
             profile.setGender(newProfile.getGender());
+            profile.setInterests(newProfile.getInterests());
             profile.setDescription(newProfile.getDescription());
             profile.setSocialLink(newProfile.getSocialLink());
             profileRepository.save(profile);
@@ -233,9 +238,10 @@ public class ProfileServiceImpl implements ProfileService {
                     null,
                     newProfile.getName(),
                     newProfile.getAge(),
-                    newProfile.getAvatar(),
+                    newProfile.getPhotos(),
                     newProfile.getCity(),
                     newProfile.getGender(),
+                    newProfile.getInterests(),
                     newProfile.getDescription(),
                     newProfile.getSocialLink(),
                     user,
@@ -249,9 +255,10 @@ public class ProfileServiceImpl implements ProfileService {
                 profile.getId(),
                 profile.getName(),
                 profile.getAge(),
-                profile.getAvatar(),
+                profile.getPhotos(),
                 profile.getCity(),
                 profile.getGender(),
+                profile.getInterests(),
                 profile.getDescription(),
                 profile.getSocialLink()
         );
