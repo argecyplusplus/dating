@@ -17,8 +17,8 @@ public class Interest {
     @SequenceGenerator(name = "interest_seq", sequenceName = "interest_seq", allocationSize = 1)
     private Long id;
 
-
-    private String value;
+    @Enumerated
+    private InterestValue value;
 
     @JsonIgnore
     @ManyToOne

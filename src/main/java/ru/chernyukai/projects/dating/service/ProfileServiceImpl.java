@@ -1,5 +1,6 @@
 package ru.chernyukai.projects.dating.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,22 +10,31 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import ru.chernyukai.projects.dating.model.Profile;
-import ru.chernyukai.projects.dating.model.ProfileInfo;
-import ru.chernyukai.projects.dating.model.User;
-import ru.chernyukai.projects.dating.model.UserAuthority;
+import org.springframework.transaction.annotation.Transactional;
+import ru.chernyukai.projects.dating.model.*;
+import ru.chernyukai.projects.dating.repository.InterestRepository;
+import ru.chernyukai.projects.dating.repository.PhotoRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
     @Autowired
     ProfileRepository profileRepository;
+
+    @Autowired
+    InterestRepository interestRepository;
+
+    @Autowired
+    PhotoRepository photoRepository;
+
+
 
     private User getCurrentUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -78,12 +88,59 @@ public class ProfileServiceImpl implements ProfileService {
             return false;
         }
 
-
-        //Подумать тут про увлечения
-
         return true;
     }
 
+    @Transactional
+    public List<Interest> updateInterests(Long profileId, List<String> interestTexts) {
+        // Получение профиля по его идентификатору
+        Optional<Profile> optionalProfile = profileRepository.findById(profileId);
+
+        List<Interest> newInterests = new ArrayList<>();
+
+        if (optionalProfile.isPresent() && interestTexts != null && !interestTexts.isEmpty()) {
+            Profile profile = optionalProfile.get();
+
+            //Удаляем старые интересы
+            interestRepository.deleteByProfile(profile);
+
+            // Создание новых объектов Interest из текстовых описаний и добавление их в список
+            for (String text : interestTexts) {
+                Interest interest = new Interest();
+                interest.setValue(InterestValue.getByTitle(text));
+                interest.setProfile(profile);
+                interestRepository.save(interest);
+                newInterests.add(interest);
+            }
+        }
+        return newInterests;
+    }
+
+    @Transactional
+    public List<ProfilePhoto> updatePhotos(Long profileId, List<String> photoLinks) {
+        // Получение профиля по его идентификатору
+        Optional<Profile> optionalProfile = profileRepository.findById(profileId);
+
+        List<ProfilePhoto> newPhotos = new ArrayList<>();
+
+        if (optionalProfile.isPresent() && photoLinks != null && !photoLinks.isEmpty()) {
+            Profile profile = optionalProfile.get();
+
+            //Удаляем старые фото
+            photoRepository.deleteByProfile(profile);
+
+            // Создание новых объектов ProfilePhoto из текстовых ссылок и добавление их в список
+            for (String link : photoLinks) {
+                ProfilePhoto photo = new ProfilePhoto();
+                photo.setLink(link);
+                photo.setProfile(profile);
+                photoRepository.save(photo);
+                newPhotos.add(photo);
+
+            }
+        }
+        return newPhotos;
+    }
 
     @Override
     public Page<ProfileInfo> getAllProfiles(int page, int minAge, int maxAge) {
@@ -100,10 +157,17 @@ public class ProfileServiceImpl implements ProfileService {
                             profile.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getPhotos(),
+                            profile.getPhotos().stream()
+                                    .map(ProfilePhoto::getLink)
+                                    .collect(Collectors.toList()),
                             profile.getCity(),
                             profile.getGender(),
-                            profile.getInterests(),
+                            profile.getInterests().stream()
+                                    .map(interest -> {
+                                        InterestValue value = interest.getValue();
+                                        return value != null ? value.getTitle() : null;
+                                    })
+                                    .collect(Collectors.toList()),
                             profile.getDescription(),
                             null
                     ));
@@ -129,10 +193,17 @@ public class ProfileServiceImpl implements ProfileService {
                         profile.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getPhotos(),
+                        profile.getPhotos().stream()
+                                .map(ProfilePhoto::getLink)
+                                .collect(Collectors.toList()),
                         profile.getCity(),
                         profile.getGender(),
-                        profile.getInterests(),
+                        profile.getInterests().stream()
+                                .map(interest -> {
+                                    InterestValue value = interest.getValue();
+                                    return value != null ? value.getTitle() : null;
+                                })
+                                .collect(Collectors.toList()),
                         profile.getDescription(),
                         null
                 ));
@@ -146,16 +217,22 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
+    @Transactional
     @Override
     public ProfileInfo editProfileById(Long id, ProfileInfo editedProfile) throws AccessDeniedException {
         Profile profile = profileRepository.getProfileById(id).get();
+
+        List <ProfilePhoto> newPhotos;
+        List <Interest> newInterests;
+
         if (userIsAdmin()){
             //Заменить анкету
             profile.setName(editedProfile.getName());
             profile.setAge(editedProfile.getAge());
-            profile.setPhotos(editedProfile.getPhotos());
+            newPhotos = updatePhotos(profile.getId(), editedProfile.getPhotos());
             profile.setCity(editedProfile.getCity());
             profile.setGender(editedProfile.getGender());
+            newInterests = updateInterests(profile.getId(), editedProfile.getInterests());
             profile.setDescription(editedProfile.getDescription());
             profile.setSocialLink(editedProfile.getSocialLink());
             profileRepository.save(profile);
@@ -163,10 +240,17 @@ public class ProfileServiceImpl implements ProfileService {
                     profile.getId(),
                     profile.getName(),
                     profile.getAge(),
-                    profile.getPhotos(),
+                    newPhotos.stream()
+                            .map(ProfilePhoto::getLink)
+                            .collect(Collectors.toList()),
                     profile.getCity(),
                     profile.getGender(),
-                    profile.getInterests(),
+                    newInterests.stream()
+                            .map(interest -> {
+                                InterestValue value = interest.getValue();
+                                return value != null ? value.getTitle() : null;
+                            })
+                            .collect(Collectors.toList()),
                     profile.getDescription(),
                     profile.getSocialLink()
             );
@@ -200,10 +284,17 @@ public class ProfileServiceImpl implements ProfileService {
                     myProfile.getId(),
                     myProfile.getName(),
                     myProfile.getAge(),
-                    myProfile.getPhotos(),
+                    myProfile.getPhotos().stream()
+                            .map(ProfilePhoto::getLink)
+                            .collect(Collectors.toList()),
                     myProfile.getCity(),
                     myProfile.getGender(),
-                    myProfile.getInterests(),
+                    myProfile.getInterests().stream()
+                            .map(interest -> {
+                                InterestValue value = interest.getValue();
+                                return value != null ? value.getTitle() : null;
+                            })
+                            .collect(Collectors.toList()),
                     myProfile.getDescription(),
                     myProfile.getSocialLink()
             ));
@@ -213,21 +304,25 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
+    @Transactional
     @Override
     public ProfileInfo editOrCreateMyProfile(ProfileInfo newProfile) {
         User user = getCurrentUser();
         Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
         Profile profile;
 
+        List <ProfilePhoto> newPhotos;
+        List <Interest> newInterests;
+
         if (myProfileOptional.isPresent()){
             profile = myProfileOptional.get();
             //Заменить анкету
             profile.setName(newProfile.getName());
             profile.setAge(newProfile.getAge());
-            profile.setPhotos(newProfile.getPhotos());
+            newPhotos = updatePhotos(profile.getId(), newProfile.getPhotos());
             profile.setCity(newProfile.getCity());
             profile.setGender(newProfile.getGender());
-            profile.setInterests(newProfile.getInterests());
+            newInterests = updateInterests(profile.getId(), newProfile.getInterests());
             profile.setDescription(newProfile.getDescription());
             profile.setSocialLink(newProfile.getSocialLink());
             profileRepository.save(profile);
@@ -238,16 +333,17 @@ public class ProfileServiceImpl implements ProfileService {
                     null,
                     newProfile.getName(),
                     newProfile.getAge(),
-                    newProfile.getPhotos(),
+                    null,
                     newProfile.getCity(),
                     newProfile.getGender(),
-                    newProfile.getInterests(),
+                    null,
                     newProfile.getDescription(),
                     newProfile.getSocialLink(),
                     user,
                     true
             );
-
+            newPhotos = updatePhotos(profile.getId(), newProfile.getPhotos());
+            newInterests = updateInterests(profile.getId(), newProfile.getInterests());
 
             profileRepository.save(profile);
         }
@@ -255,10 +351,17 @@ public class ProfileServiceImpl implements ProfileService {
                 profile.getId(),
                 profile.getName(),
                 profile.getAge(),
-                profile.getPhotos(),
+                newPhotos.stream()
+                        .map(ProfilePhoto::getLink)
+                        .collect(Collectors.toList()),
                 profile.getCity(),
                 profile.getGender(),
-                profile.getInterests(),
+                newInterests.stream()
+                        .map(interest -> {
+                            InterestValue value = interest.getValue();
+                            return value != null ? value.getTitle() : null;
+                        })
+                        .collect(Collectors.toList()),
                 profile.getDescription(),
                 profile.getSocialLink()
         );

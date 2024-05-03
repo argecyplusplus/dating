@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import ru.chernyukai.projects.dating.model.Match;
-import ru.chernyukai.projects.dating.model.Profile;
-import ru.chernyukai.projects.dating.model.ProfileInfo;
-import ru.chernyukai.projects.dating.model.User;
+import ru.chernyukai.projects.dating.model.*;
 import ru.chernyukai.projects.dating.repository.MatchRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,10 +98,17 @@ public class MatchServiceImpl implements MatchService{
                         match.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getPhotos(),
+                        profile.getPhotos().stream()
+                                .map(ProfilePhoto::getLink)
+                                .collect(Collectors.toList()),
                         profile.getCity(),
                         profile.getGender(),
-                        profile.getInterests(),
+                        profile.getInterests().stream()
+                                .map(interest -> {
+                                    InterestValue value = interest.getValue();
+                                    return value != null ? value.getTitle() : null;
+                                })
+                                .collect(Collectors.toList()),
                         profile.getDescription(),
                         null
                 ));
@@ -137,10 +142,18 @@ public class MatchServiceImpl implements MatchService{
                         profile.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getPhotos(),
+                        profile.getPhotos().stream()
+                                .map(ProfilePhoto::getLink)
+                                .collect(Collectors.toList()),
                         profile.getCity(),
                         profile.getGender(),
-                        profile.getInterests(),
+                        profile.getInterests().stream()
+                                .map(interest -> {
+                                    InterestValue value = interest.getValue();
+                                    return value != null ? value.getTitle() : null;
+                                })
+                                .collect(Collectors.toList()),
+
                         profile.getDescription(),
                         profile.getSocialLink()
                 ));
@@ -163,10 +176,18 @@ public class MatchServiceImpl implements MatchService{
                             match.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getPhotos(),
+                            profile.getPhotos().stream()
+                                    .map(ProfilePhoto::getLink)
+                                    .collect(Collectors.toList()),
                             profile.getCity(),
                             profile.getGender(),
-                            profile.getInterests(),
+                            profile.getInterests().stream()
+                                    .map(interest -> {
+                                        InterestValue value = interest.getValue();
+                                        return value != null ? value.getTitle() : null;
+                                    })
+                                    .collect(Collectors.toList()),
+
                             profile.getDescription(),
                             null
 
@@ -203,10 +224,18 @@ public class MatchServiceImpl implements MatchService{
                             match.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getPhotos(),
+                            profile.getPhotos().stream()
+                                    .map(ProfilePhoto::getLink)
+                                    .collect(Collectors.toList()),
                             profile.getCity(),
                             profile.getGender(),
-                            profile.getInterests(),
+                            profile.getInterests().stream()
+                                    .map(interest -> {
+                                        InterestValue value = interest.getValue();
+                                        return value != null ? value.getTitle() : null;
+                                    })
+                                    .collect(Collectors.toList()),
+
                             profile.getDescription(),
                             profile.getSocialLink()
 

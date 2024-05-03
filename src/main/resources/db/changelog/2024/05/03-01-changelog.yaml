@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1714737069418-1
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: value
+            tableName: interests
+  - changeSet:
+      id: 1714737069418-2
+      author: ????????????? (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: value
+                  type: SMALLINT
+            tableName: interests
+

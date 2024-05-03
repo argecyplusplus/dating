@@ -13,10 +13,10 @@ public class ProfileInfo {
     private Long id;
     private String name;
     private int age;
-    private List<ProfilePhoto> photos;
+    private List<String> photos;
     private String city;
     private String gender;
-    private List<Interest> interests;
+    private List<String> interests;
     private String description;
     private String socialLink;
 }
