@@ -1,19 +1,14 @@
 package ru.chernyukai.projects.dating.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Request;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
-import ru.chernyukai.projects.dating.model.Match;
-import ru.chernyukai.projects.dating.model.Profile;
 import ru.chernyukai.projects.dating.model.ProfileInfo;
-import ru.chernyukai.projects.dating.repository.MatchRepository;
 import ru.chernyukai.projects.dating.service.MatchService;
 import ru.chernyukai.projects.dating.service.ProfileService;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -26,7 +21,13 @@ public class ProfileController {
     //ВСЕ АНКЕТЫ
     @GetMapping
     public ResponseEntity<Page<ProfileInfo>> getAllProfiles(@RequestParam("page") int page, @RequestParam("min_age") int minAge, @RequestParam("max_age") int maxAge){
-        return ResponseEntity.ok(profileService.getAllProfiles(page, minAge, maxAge));
+        try{
+            return ResponseEntity.ok(profileService.getAllProfiles(page, minAge, maxAge));
+        }
+        catch (AccessDeniedException e){
+            return ResponseEntity.status(403).build();
+        }
+
     }
 
     //КОНКРЕТНАЯ АНКЕТА

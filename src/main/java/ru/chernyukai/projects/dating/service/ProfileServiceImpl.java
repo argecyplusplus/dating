@@ -1,6 +1,5 @@
 package ru.chernyukai.projects.dating.service;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,10 +15,7 @@ import ru.chernyukai.projects.dating.repository.InterestRepository;
 import ru.chernyukai.projects.dating.repository.PhotoRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -142,45 +138,66 @@ public class ProfileServiceImpl implements ProfileService {
         return newPhotos;
     }
 
+
+
+
+
     @Override
-    public Page<ProfileInfo> getAllProfiles(int page, int minAge, int maxAge) {
+    public Page<ProfileInfo> getAllProfiles(int page, int minAge, int maxAge) throws AccessDeniedException {
         List<Profile> allProfiles = profileRepository.findProfilesBy();
 
-        List<ProfileInfo> allowedProfiles = new ArrayList<>();
+        Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(getCurrentUser());
+        if (myProfileOptional.isEmpty()){
+            throw new AccessDeniedException("Вам нужно создать профиль");
+        }
 
+        Profile myProfile = myProfileOptional.get();
+        List<Profile> allowedProfiles = new ArrayList<>();
 
+        //Получение доступных профилей
         for (Profile profile: allProfiles){
             if (checkAccessToProfile(profile)){
                 if (minAge <= profile.getAge() && profile.getAge()<=maxAge)
                 {
-                    allowedProfiles.add(new ProfileInfo(
-                            profile.getId(),
-                            profile.getName(),
-                            profile.getAge(),
-                            profile.getPhotos().stream()
-                                    .map(ProfilePhoto::getLink)
-                                    .collect(Collectors.toList()),
-                            profile.getCity(),
-                            profile.getGender(),
-                            profile.getInterests().stream()
-                                    .map(interest -> {
-                                        InterestValue value = interest.getValue();
-                                        return value != null ? value.getTitle() : null;
-                                    })
-                                    .collect(Collectors.toList()),
-                            profile.getDescription(),
-                            null
-                    ));
+                    allowedProfiles.add(profile);
                 }
             }
         }
 
+        //Сортировка по интересам
+
+
+        //Создание списка ProfileInfo из списка Profile
+        List<ProfileInfo> allowedProfileInfos  = new ArrayList<>();
+        for (Profile profile: allowedProfiles){
+            allowedProfileInfos.add(new ProfileInfo(
+                    profile.getId(),
+                    profile.getName(),
+                    profile.getAge(),
+                    profile.getPhotos().stream()
+                            .map(ProfilePhoto::getLink)
+                            .collect(Collectors.toList()),
+                    profile.getCity(),
+                    profile.getGender(),
+                    profile.getInterests().stream()
+                            .map(interest -> {
+                                InterestValue value = interest.getValue();
+                                return value != null ? value.getTitle() : null;
+                            })
+                            .collect(Collectors.toList()),
+                    profile.getDescription(),
+                    null
+            ));
+        }
+
+
+
         //Вывести страницу отфильтрованных
-        int start = Math.min(page * 10, allowedProfiles.size());
-        int end = Math.min((page + 1) * 10, allowedProfiles.size());
-        List<ProfileInfo> profilesOnPage = allowedProfiles.subList(start, end);
+        int start = Math.min(page * 10, allowedProfileInfos.size());
+        int end = Math.min((page + 1) * 10, allowedProfileInfos.size());
+        List<ProfileInfo> profilesOnPage = allowedProfileInfos.subList(start, end);
         Pageable pageable = PageRequest.of(page, 10);
-        return new PageImpl<>(profilesOnPage, pageable, allowedProfiles.size());
+        return new PageImpl<>(profilesOnPage, pageable, allowedProfileInfos.size());
     }
 
     @Override
