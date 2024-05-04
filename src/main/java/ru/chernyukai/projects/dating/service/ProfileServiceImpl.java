@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.chernyukai.projects.dating.model.*;
 import ru.chernyukai.projects.dating.repository.InterestRepository;
+import ru.chernyukai.projects.dating.repository.MatchRepository;
 import ru.chernyukai.projects.dating.repository.PhotoRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
@@ -23,6 +24,9 @@ import java.util.stream.Collectors;
 public class ProfileServiceImpl implements ProfileService {
     @Autowired
     ProfileRepository profileRepository;
+
+    @Autowired
+    MatchRepository matchRepository;
 
     @Autowired
     InterestRepository interestRepository;
@@ -171,9 +175,15 @@ public class ProfileServiceImpl implements ProfileService {
         //Получение доступных профилей
         for (Profile profile: allProfiles){
             if (checkAccessToProfile(profile)){
-                if (minAge <= profile.getAge() && profile.getAge()<=maxAge)
-                {
-                    allowedProfiles.add(profile);
+
+                Optional<Match> potentialPair = matchRepository.getPairByProfile1AndProfile2(myProfile.getId(), profile.getId());
+
+                if (potentialPair.isEmpty()){
+                    if (minAge <= profile.getAge() && profile.getAge()<=maxAge)
+                    {
+
+                        allowedProfiles.add(profile);
+                    }
                 }
             }
         }

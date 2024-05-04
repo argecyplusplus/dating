@@ -22,6 +22,8 @@ public interface MatchRepository extends JpaRepository<Match, Long>, PagingAndSo
 
     Optional<Match> getMatchByProfile1AndProfile2(Profile profile1, Profile profile2);
 
+    @Query(value = "select * from matches where is_pair=true and (profile1_id = :profile1 and profile2_id = :profile2 or  profile1_id = :profile2 and profile2_id = :profile1  ) limit 1", nativeQuery = true)
+    Optional<Match> getPairByProfile1AndProfile2 (@Param("profile1") Long profile1Id, @Param("profile2") Long profile2Id);
 
     Optional<Match> getMatchById(Long id);
 }
