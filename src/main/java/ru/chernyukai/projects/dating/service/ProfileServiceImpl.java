@@ -139,7 +139,21 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
 
+    // Посчет общих интересов
+    private static int countCommonInterests(Profile profile1, Profile profile2) {
+        Set<InterestValue> interests1 = profile1.getInterests().stream()
+                .map(Interest::getValue)
+                .collect(Collectors.toSet());
 
+        Set<InterestValue> interests2 = profile2.getInterests().stream()
+                .map(Interest::getValue)
+                .collect(Collectors.toSet());
+
+        // Находим общие интересы
+        interests1.retainAll(interests2);
+
+        return interests1.size();
+    }
 
 
     @Override
@@ -164,7 +178,12 @@ public class ProfileServiceImpl implements ProfileService {
             }
         }
 
-        //Сортировка по интересам
+        // Сортируем профили по убыванию количества общих интересов
+        allowedProfiles.sort((p1, p2) -> {
+            int commonEdges1 = countCommonInterests(p1, myProfile);
+            int commonEdges2 = countCommonInterests(p2, myProfile);
+            return Integer.compare(commonEdges2, commonEdges1); // Сортировка по убыванию
+        });
 
 
         //Создание списка ProfileInfo из списка Profile
