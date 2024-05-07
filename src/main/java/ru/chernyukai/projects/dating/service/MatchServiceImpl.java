@@ -2,6 +2,7 @@ package ru.chernyukai.projects.dating.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.chernyukai.projects.dating.model.*;
@@ -21,6 +22,9 @@ public class MatchServiceImpl implements MatchService{
 
     @Autowired
     ProfileRepository profileRepository;
+
+    @Autowired
+    ProfileService profileService;
 
     private User getCurrentUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -48,10 +52,15 @@ public class MatchServiceImpl implements MatchService{
     }
 
     @Override
-    public void sendLike (Long id){
+    public void sendLike (Long id) throws AccessDeniedException{
 
         Profile sender = profileRepository.getProfileByUser(getCurrentUser()).get();
         Profile receiver = profileRepository.getProfileById(id).get();
+
+        if (!profileService.checkAccessToProfile(receiver)){
+            throw new AccessDeniedException ("Нет доступа к этому мэтчу");
+        }
+
 
         if (
                 matchRepository.getMatchByProfile1AndProfile2(sender, receiver).isPresent()
@@ -250,15 +259,27 @@ public class MatchServiceImpl implements MatchService{
     }
 
     @Override
-    public void createPair(Long matchId) {
+    public void createPair(Long matchId) throws AccessDeniedException {
+
         Match match = matchRepository.getMatchById(matchId).get();
-        match.setPair(true);
-        matchRepository.save(match);
+        if (checkAccessToMatch(matchId)){
+            match.setPair(true);
+            matchRepository.save(match);
+        }
+        else{
+            throw new AccessDeniedException("Нет доступа к этому мэтчу");
+        }
+
     }
 
     @Override
-    public void deleteMatch(Long matchId) {
-        matchRepository.deleteById(matchId);
+    public void deleteMatch(Long matchId) throws AccessDeniedException {
+        if (checkAccessToMatch(matchId)) {
+            matchRepository.deleteById(matchId);
+        }
+        else {
+            throw new AccessDeniedException("Нет доступа к этому мэтчу");
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package ru.chernyukai.projects.dating.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import ru.chernyukai.projects.dating.model.ProfileInfo;
 import ru.chernyukai.projects.dating.service.MatchService;
@@ -30,16 +31,20 @@ public class MatchController {
 
     @PostMapping("/{id}")
     public ResponseEntity<ProfileInfo> answerForMatch(@PathVariable ("id") Long id, @RequestParam("action") String action){
-        if (action.equals("like")){
-            matchService.createPair(id);
-            return ResponseEntity.ok().build();
+        try
+        {
+            if (action.equals("like")) {
+                matchService.createPair(id);
+                return ResponseEntity.ok().build();
+            } else if (action.equals("dislike")) {
+                matchService.deleteMatch(id);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
         }
-        else if (action.equals("dislike")){
-            matchService.deleteMatch(id);
-            return ResponseEntity.ok().build();
-        }
-        else{
-            return ResponseEntity.badRequest().build();
+        catch (AccessDeniedException e){
+            return ResponseEntity.status(403).build();
         }
     }
 

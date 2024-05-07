@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.chernyukai.projects.dating.exceptions.InvalidProfileException;
 import ru.chernyukai.projects.dating.model.*;
 import ru.chernyukai.projects.dating.repository.InterestRepository;
 import ru.chernyukai.projects.dating.repository.MatchRepository;
@@ -48,7 +49,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .anyMatch(UserAuthority.ADMIN::equals);
     }
 
-    private boolean checkAccessToProfile(Profile profile) {
+    public boolean checkAccessToProfile(Profile profile) {
         User user = getCurrentUser();
 
         //Если зашел админ
@@ -352,7 +353,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public ProfileInfo editOrCreateMyProfile(ProfileInfo newProfile) {
+    public ProfileInfo editOrCreateMyProfile(ProfileInfo newProfile) throws InvalidProfileException {
         User user = getCurrentUser();
         Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
         Profile profile;
@@ -360,14 +361,25 @@ public class ProfileServiceImpl implements ProfileService {
         List <ProfilePhoto> newPhotos;
         List <Interest> newInterests;
 
+        //Проверка валидности
+        int age = newProfile.getAge();
+        if (!(18<= age && age <=100)){
+            throw new InvalidProfileException("Ошибка в указании возраста");
+        }
+        String gender = newProfile.getGender();
+        if (!(gender.equals("Мужской") || gender.equals("Женский"))){
+            throw new InvalidProfileException("Ошибка в указании пола");
+        }
+
+
         if (myProfileOptional.isPresent()){
             profile = myProfileOptional.get();
             //Заменить анкету
             profile.setName(newProfile.getName());
-            profile.setAge(newProfile.getAge());
+            profile.setAge(age);
             newPhotos = updatePhotos(profile.getId(), newProfile.getPhotos());
             profile.setCity(newProfile.getCity());
-            profile.setGender(newProfile.getGender());
+            profile.setGender(gender);
             newInterests = updateInterests(profile.getId(), newProfile.getInterests());
             profile.setDescription(newProfile.getDescription());
             profile.setSocialLink(newProfile.getSocialLink());
@@ -378,10 +390,10 @@ public class ProfileServiceImpl implements ProfileService {
             profile = new Profile(
                     null,
                     newProfile.getName(),
-                    newProfile.getAge(),
+                    age,
                     null,
                     newProfile.getCity(),
-                    newProfile.getGender(),
+                    gender,
                     null,
                     newProfile.getDescription(),
                     newProfile.getSocialLink(),

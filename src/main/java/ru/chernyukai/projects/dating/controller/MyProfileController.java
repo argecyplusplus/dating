@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.chernyukai.projects.dating.exceptions.InvalidProfileException;
 import ru.chernyukai.projects.dating.model.Profile;
 import ru.chernyukai.projects.dating.model.ProfileInfo;
 import ru.chernyukai.projects.dating.service.ProfileService;
@@ -31,12 +32,23 @@ public class MyProfileController {
 
     @PostMapping
     ResponseEntity<ProfileInfo>  createMyProfile(@RequestBody ProfileInfo newProfile){
-        return ResponseEntity.ok(profileService.editOrCreateMyProfile(newProfile));
+        try{
+            return ResponseEntity.ok(profileService.editOrCreateMyProfile(newProfile));
+        }
+        catch (InvalidProfileException e){
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @PutMapping
     ResponseEntity<ProfileInfo>  editMyProfile(@RequestBody ProfileInfo newProfile){
-        return ResponseEntity.ok(profileService.editOrCreateMyProfile(newProfile));
+        try{
+            return ResponseEntity.ok(profileService.editOrCreateMyProfile(newProfile));
+        }
+        catch (InvalidProfileException e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping
