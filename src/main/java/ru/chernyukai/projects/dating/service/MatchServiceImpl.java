@@ -30,7 +30,29 @@ public class MatchServiceImpl implements MatchService{
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    private boolean checkAccessToMatch (Long matchId){
+
+    private boolean checkAccessToMatch(Long matchId){
+        User user = getCurrentUser();
+        Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
+
+        if (myProfileOptional.isEmpty()){
+            return false;
+        }
+
+        Profile myProfile = myProfileOptional.get();
+
+        Match match = matchRepository.getMatchById(matchId).get();
+
+        Profile profile2 = match.getProfile2();
+
+        //Проверка что юзер получатель
+        return myProfile.getId().equals(profile2.getId());
+
+    }
+
+
+
+    private boolean checkAccessToPair (Long matchId){
         User user = getCurrentUser();
 
         Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
@@ -46,10 +68,12 @@ public class MatchServiceImpl implements MatchService{
         Profile profile1 = match.getProfile1();
         Profile profile2 = match.getProfile2();
 
+        //Проверка что юзер есть в мэтче
         return myProfile.getId().equals(profile1.getId())
                 || myProfile.getId().equals(profile2.getId());
 
     }
+
 
     @Override
     public void sendLike (Long id) throws AccessDeniedException{
@@ -213,7 +237,7 @@ public class MatchServiceImpl implements MatchService{
     @Override
     public Optional<ProfileInfo> getProfileFromPair (Long matchId){
         Optional<Match> matchOptional = matchRepository.getMatchById(matchId);
-        if (matchOptional.isPresent() && checkAccessToMatch(matchId)){
+        if (matchOptional.isPresent() && checkAccessToPair(matchId)){
             Match match = matchOptional.get();
             Profile profile;
 
