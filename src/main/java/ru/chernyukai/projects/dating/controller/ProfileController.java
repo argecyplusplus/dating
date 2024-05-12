@@ -53,7 +53,7 @@ public class ProfileController {
                 return ResponseEntity.ok(newProfile);
             }
             catch (AccessDeniedException e){
-                return (ResponseEntity<ProfileInfo>) ResponseEntity.status(403);
+                return ResponseEntity.status(403).build();
             }
         }
         else {
@@ -71,7 +71,7 @@ public class ProfileController {
                 return ResponseEntity.ok().build();
             }
             catch (AccessDeniedException e){
-                return (ResponseEntity<ProfileInfo>) ResponseEntity.status(403);
+                return ResponseEntity.status(403).build();
             }
         }
         else {

@@ -27,8 +27,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void registration(String username, String password) throws UsernameAlreadyExistsException {
+    public void registration(String username, String password) throws UsernameAlreadyExistsException, IllegalArgumentException {
         if (userRepository.findByUsername(username).isEmpty()) {
+
+            if (username == null || password == null ){
+                throw new IllegalArgumentException();
+            }
+
             User user = userRepository.save(
                     new User()
                             .setId(null)

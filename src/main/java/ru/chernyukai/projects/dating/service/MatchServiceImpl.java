@@ -11,6 +11,7 @@ import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,57 @@ public class MatchServiceImpl implements MatchService{
 
     private User getCurrentUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private boolean userIsAdmin (){
+        User user = getCurrentUser();
+        return user.getAuthorities().stream()
+                .filter(authority -> authority instanceof UserAuthority)
+                .map(authority -> (UserAuthority) authority)
+                .anyMatch(UserAuthority.ADMIN::equals);
+    }
+
+    private boolean checkAccessToProfile(Profile profile) {
+        User user = getCurrentUser();
+
+        //Если зашел админ
+        if (userIsAdmin()){
+            return true;
+        }
+
+        Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
+
+        //Если не заполнен свой профиль
+        if (myProfileOptional.isEmpty()){
+            System.out.println("Не заполнен профиль");
+            return false;
+        }
+        Profile myProfile = myProfileOptional.get();
+        //Если видишь свой профиль
+        if(Objects.equals(profile.getId(), myProfile.getId())){
+            System.out.println("Это твой профиль");
+            return false;
+        }
+
+        //Твой профиль отключен
+        if(!myProfile.isVisible()){
+            System.out.println("Твой профиль отключен");
+            return false;
+        }
+
+        //Проверка на пол
+        if (profile.getGender().equals(myProfile.getGender())){
+            System.out.println("ЛГБТ ФУ");
+            return false;
+        }
+
+        //Проверка на город
+        if (!profile.getCity().equals(myProfile.getCity())){
+            System.out.println("Не тот город");
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -81,7 +133,7 @@ public class MatchServiceImpl implements MatchService{
         Profile sender = profileRepository.getProfileByUser(getCurrentUser()).get();
         Profile receiver = profileRepository.getProfileById(id).get();
 
-        if (!profileService.checkAccessToProfile(receiver)){
+        if (!checkAccessToProfile(receiver)){
             throw new AccessDeniedException ("Нет доступа к этому мэтчу");
         }
 

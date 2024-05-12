@@ -49,7 +49,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .anyMatch(UserAuthority.ADMIN::equals);
     }
 
-    public boolean checkAccessToProfile(Profile profile) {
+    private boolean checkAccessToProfile(Profile profile) {
         User user = getCurrentUser();
 
         //Если зашел админ

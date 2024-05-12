@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ProfileService {
 
-    boolean checkAccessToProfile(Profile profile);
+    //boolean checkAccessToProfile(Profile profile);
 
     Page<ProfileInfo> getAllProfiles(int page, int minAge, int maxAge);
 
