@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,11 +38,13 @@ public class ProfileServiceImpl implements ProfileService {
 
 
 
-    private User getCurrentUser(){
+    public User getCurrentUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    private boolean userIsAdmin (){
+
+
+    public boolean userIsAdmin (){
         User user = getCurrentUser();
         return user.getAuthorities().stream()
                 .filter(authority -> authority instanceof UserAuthority)
@@ -49,7 +52,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .anyMatch(UserAuthority.ADMIN::equals);
     }
 
-    private boolean checkAccessToProfile(Profile profile) {
+    public boolean checkAccessToProfile(Profile profile) {
         User user = getCurrentUser();
 
         //Если зашел админ
@@ -145,7 +148,7 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     // Посчет общих интересов
-    private static int countCommonInterests(Profile profile1, Profile profile2) {
+    public int countCommonInterests(Profile profile1, Profile profile2) {
         Set<InterestValue> interests1 = profile1.getInterests().stream()
                 .map(Interest::getValue)
                 .collect(Collectors.toSet());
@@ -266,8 +269,15 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public ProfileInfo editProfileById(Long id, ProfileInfo editedProfile) throws AccessDeniedException {
-        Profile profile = profileRepository.getProfileById(id).get();
+    public ProfileInfo editProfileById(Long id, ProfileInfo editedProfile) throws AccessDeniedException, NoSuchElementException {
+
+        Optional<Profile> profileOptional = profileRepository.getProfileById(id);
+
+        if (profileOptional.isEmpty()){
+            throw new NoSuchElementException();
+        }
+
+        Profile profile = profileOptional.get();
 
         List <ProfilePhoto> newPhotos;
         List <Interest> newInterests;
@@ -309,8 +319,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfileById(Long id) throws AccessDeniedException{
-        Profile profile = profileRepository.getProfileById(id).get();
+
         if (userIsAdmin()){
+            Profile profile = profileRepository.getProfileById(id).get();
             //Удалить анкету
             profileRepository.delete(profile);
         }
