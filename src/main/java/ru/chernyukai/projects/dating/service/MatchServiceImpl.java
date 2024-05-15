@@ -9,10 +9,7 @@ import ru.chernyukai.projects.dating.model.*;
 import ru.chernyukai.projects.dating.repository.MatchRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,7 +36,7 @@ public class MatchServiceImpl implements MatchService{
                 .anyMatch(UserAuthority.ADMIN::equals);
     }
 
-    private boolean checkAccessToProfile(Profile profile) {
+    public boolean checkAccessToProfile(Profile profile) {
         User user = getCurrentUser();
 
         //Если зашел админ
@@ -83,7 +80,7 @@ public class MatchServiceImpl implements MatchService{
     }
 
 
-    private boolean checkAccessToMatch(Long matchId){
+    public boolean checkAccessToMatch(Long matchId){
         User user = getCurrentUser();
         Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
 
@@ -104,7 +101,7 @@ public class MatchServiceImpl implements MatchService{
 
 
 
-    private boolean checkAccessToPair (Long matchId){
+    public boolean checkAccessToPair (Long matchId){
         User user = getCurrentUser();
 
         Optional<Profile> myProfileOptional = profileRepository.getProfileByUser(user);
@@ -183,17 +180,21 @@ public class MatchServiceImpl implements MatchService{
                         match.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getPhotos().stream()
-                                .map(ProfilePhoto::getLink)
-                                .collect(Collectors.toList()),
+                        profile.getPhotos() != null ?
+                                profile.getPhotos().stream()
+                                        .map(ProfilePhoto::getLink)
+                                        .collect(Collectors.toList()) :
+                                Collections.emptyList(),
                         profile.getCity(),
                         profile.getGender(),
-                        profile.getInterests().stream()
-                                .map(interest -> {
-                                    InterestValue value = interest.getValue();
-                                    return value != null ? value.getTitle() : null;
-                                })
-                                .collect(Collectors.toList()),
+                        profile.getInterests() != null ?
+                                profile.getInterests().stream()
+                                        .map(interest -> {
+                                            InterestValue value = interest.getValue();
+                                            return value != null ? value.getTitle() : null;
+                                        })
+                                        .collect(Collectors.toList()) :
+                                Collections.emptyList(),
                         profile.getDescription(),
                         null
                 ));
@@ -227,17 +228,21 @@ public class MatchServiceImpl implements MatchService{
                         profile.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getPhotos().stream()
-                                .map(ProfilePhoto::getLink)
-                                .collect(Collectors.toList()),
+                        profile.getPhotos() != null ?
+                                profile.getPhotos().stream()
+                                        .map(ProfilePhoto::getLink)
+                                        .collect(Collectors.toList()) :
+                                Collections.emptyList(),
                         profile.getCity(),
                         profile.getGender(),
-                        profile.getInterests().stream()
-                                .map(interest -> {
-                                    InterestValue value = interest.getValue();
-                                    return value != null ? value.getTitle() : null;
-                                })
-                                .collect(Collectors.toList()),
+                        profile.getInterests() != null ?
+                                profile.getInterests().stream()
+                                        .map(interest -> {
+                                            InterestValue value = interest.getValue();
+                                            return value != null ? value.getTitle() : null;
+                                        })
+                                        .collect(Collectors.toList()) :
+                                Collections.emptyList(),
 
                         profile.getDescription(),
                         profile.getSocialLink()
