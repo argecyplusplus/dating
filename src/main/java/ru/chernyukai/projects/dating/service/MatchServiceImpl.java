@@ -48,31 +48,26 @@ public class MatchServiceImpl implements MatchService{
 
         //Если не заполнен свой профиль
         if (myProfileOptional.isEmpty()){
-            System.out.println("Не заполнен профиль");
             return false;
         }
         Profile myProfile = myProfileOptional.get();
         //Если видишь свой профиль
         if(Objects.equals(profile.getId(), myProfile.getId())){
-            System.out.println("Это твой профиль");
             return false;
         }
 
         //Твой профиль отключен
         if(!myProfile.isVisible()){
-            System.out.println("Твой профиль отключен");
             return false;
         }
 
         //Проверка на пол
         if (profile.getGender().equals(myProfile.getGender())){
-            System.out.println("ЛГБТ ФУ");
             return false;
         }
 
         //Проверка на город
         if (!profile.getCity().equals(myProfile.getCity())){
-            System.out.println("Не тот город");
             return false;
         }
 
