@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import ru.chernyukai.projects.dating.components.ProfilePhotoConverter;
 import ru.chernyukai.projects.dating.model.*;
 import ru.chernyukai.projects.dating.repository.MatchRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
@@ -74,6 +76,7 @@ public class MatchServiceImpl implements MatchService{
         return true;
     }
 
+    ProfilePhotoConverter converter = new ProfilePhotoConverter();
 
     public boolean checkAccessToMatch(Long matchId){
         User user = getCurrentUser();
@@ -177,7 +180,7 @@ public class MatchServiceImpl implements MatchService{
                         profile.getAge(),
                         profile.getPhotos() != null ?
                                 profile.getPhotos().stream()
-                                        .map(ProfilePhoto::getLink)
+                                        .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
                                         .collect(Collectors.toList()) :
                                 Collections.emptyList(),
                         profile.getCity(),
@@ -225,7 +228,7 @@ public class MatchServiceImpl implements MatchService{
                         profile.getAge(),
                         profile.getPhotos() != null ?
                                 profile.getPhotos().stream()
-                                        .map(ProfilePhoto::getLink)
+                                        .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
                                         .collect(Collectors.toList()) :
                                 Collections.emptyList(),
                         profile.getCity(),
@@ -261,9 +264,11 @@ public class MatchServiceImpl implements MatchService{
                             match.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getPhotos().stream()
-                                    .map(ProfilePhoto::getLink)
-                                    .collect(Collectors.toList()),
+                            profile.getPhotos() != null ?
+                                    profile.getPhotos().stream()
+                                            .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
+                                            .collect(Collectors.toList()) :
+                                    Collections.emptyList(),
                             profile.getCity(),
                             profile.getGender(),
                             profile.getInterests().stream()
@@ -309,9 +314,11 @@ public class MatchServiceImpl implements MatchService{
                             match.getId(),
                             profile.getName(),
                             profile.getAge(),
-                            profile.getPhotos().stream()
-                                    .map(ProfilePhoto::getLink)
-                                    .collect(Collectors.toList()),
+                            profile.getPhotos() != null ?
+                                    profile.getPhotos().stream()
+                                            .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
+                                            .collect(Collectors.toList()) :
+                                    Collections.emptyList(),
                             profile.getCity(),
                             profile.getGender(),
                             profile.getInterests().stream()

@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import ru.chernyukai.projects.dating.components.ProfilePhotoConverter;
 import ru.chernyukai.projects.dating.exceptions.InvalidProfileException;
 import ru.chernyukai.projects.dating.model.*;
 import ru.chernyukai.projects.dating.repository.InterestRepository;
@@ -18,6 +20,7 @@ import ru.chernyukai.projects.dating.repository.MatchRepository;
 import ru.chernyukai.projects.dating.repository.PhotoRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -121,30 +124,30 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Transactional
-    public List<ProfilePhoto> updatePhotos(Long profileId, List<String> photoLinks) {
+    public List<ProfilePhoto> updatePhotos(Long profileId, List<MultipartFile> files) throws IOException {
         // Получение профиля по его идентификатору
         Optional<Profile> optionalProfile = profileRepository.findById(profileId);
 
         List<ProfilePhoto> newPhotos = new ArrayList<>();
 
-        if (optionalProfile.isPresent() && photoLinks != null && !photoLinks.isEmpty()) {
+        if (optionalProfile.isPresent() && files != null && !files.isEmpty()) {
             Profile profile = optionalProfile.get();
-
-            //Удаляем старые фото
             photoRepository.deleteByProfile(profile);
 
-            // Создание новых объектов ProfilePhoto из текстовых ссылок и добавление их в список
-            for (String link : photoLinks) {
+            for (MultipartFile file : files) {
                 ProfilePhoto photo = new ProfilePhoto();
-                photo.setLink(link);
+                photo.setFileName(file.getOriginalFilename());
+                photo.setFileType(file.getContentType());
+                photo.setData(file.getBytes());
                 photo.setProfile(profile);
                 photoRepository.save(photo);
                 newPhotos.add(photo);
-
             }
         }
         return newPhotos;
     }
+
+    ProfilePhotoConverter converter = new ProfilePhotoConverter();
 
 
     // Посчет общих интересов
@@ -207,9 +210,11 @@ public class ProfileServiceImpl implements ProfileService {
                     profile.getId(),
                     profile.getName(),
                     profile.getAge(),
-                    profile.getPhotos().stream()
-                            .map(ProfilePhoto::getLink)
-                            .collect(Collectors.toList()),
+                    profile.getPhotos() != null ?
+                            profile.getPhotos().stream()
+                                    .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
+                                    .collect(Collectors.toList()) :
+                            Collections.emptyList(),
                     profile.getCity(),
                     profile.getGender(),
                     profile.getInterests().stream()
@@ -243,9 +248,11 @@ public class ProfileServiceImpl implements ProfileService {
                         profile.getId(),
                         profile.getName(),
                         profile.getAge(),
-                        profile.getPhotos().stream()
-                                .map(ProfilePhoto::getLink)
-                                .collect(Collectors.toList()),
+                        profile.getPhotos() != null ?
+                                profile.getPhotos().stream()
+                                        .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
+                                        .collect(Collectors.toList()) :
+                                Collections.emptyList(),
                         profile.getCity(),
                         profile.getGender(),
                         profile.getInterests().stream()
@@ -286,7 +293,12 @@ public class ProfileServiceImpl implements ProfileService {
             //Заменить анкету
             profile.setName(editedProfile.getName());
             profile.setAge(editedProfile.getAge());
-            newPhotos = updatePhotos(profile.getId(), editedProfile.getPhotos());
+            try {
+                newPhotos = updatePhotos(profile.getId(), editedProfile.getPhotos());
+            }
+            catch (IOException e){
+                newPhotos = new ArrayList<>();
+            }
             profile.setCity(editedProfile.getCity());
             profile.setGender(editedProfile.getGender());
             newInterests = updateInterests(profile.getId(), editedProfile.getInterests());
@@ -297,9 +309,11 @@ public class ProfileServiceImpl implements ProfileService {
                     profile.getId(),
                     profile.getName(),
                     profile.getAge(),
-                    newPhotos.stream()
-                            .map(ProfilePhoto::getLink)
-                            .collect(Collectors.toList()),
+                    newPhotos != null ?
+                            profile.getPhotos().stream()
+                                    .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
+                                    .collect(Collectors.toList()) :
+                            Collections.emptyList(),
                     profile.getCity(),
                     profile.getGender(),
                     newInterests.stream()
@@ -342,9 +356,11 @@ public class ProfileServiceImpl implements ProfileService {
                     myProfile.getId(),
                     myProfile.getName(),
                     myProfile.getAge(),
-                    myProfile.getPhotos().stream()
-                            .map(ProfilePhoto::getLink)
-                            .collect(Collectors.toList()),
+                    myProfile.getPhotos() != null ?
+                            myProfile.getPhotos().stream()
+                                    .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(myProfile.getPhotos()).stream())
+                                    .collect(Collectors.toList()) :
+                            Collections.emptyList(),
                     myProfile.getCity(),
                     myProfile.getGender(),
                     myProfile.getInterests().stream()
@@ -388,7 +404,12 @@ public class ProfileServiceImpl implements ProfileService {
             //Заменить анкету
             profile.setName(newProfile.getName());
             profile.setAge(age);
-            newPhotos = updatePhotos(profile.getId(), newProfile.getPhotos());
+            try {
+                newPhotos = updatePhotos(profile.getId(), newProfile.getPhotos());
+            }
+            catch (IOException e){
+                newPhotos = new ArrayList<>();
+            }
             profile.setCity(newProfile.getCity());
             profile.setGender(gender);
             newInterests = updateInterests(profile.getId(), newProfile.getInterests());
@@ -411,8 +432,14 @@ public class ProfileServiceImpl implements ProfileService {
                     user,
                     true
             );
-            newPhotos = updatePhotos(profile.getId(), newProfile.getPhotos());
+            try{
+                newPhotos = updatePhotos(profile.getId(), newProfile.getPhotos());
+            }
+            catch (IOException e){
+                newPhotos = new ArrayList<>();
+            }
             newInterests = updateInterests(profile.getId(), newProfile.getInterests());
+
 
             profileRepository.save(profile);
         }
@@ -420,9 +447,11 @@ public class ProfileServiceImpl implements ProfileService {
                 profile.getId(),
                 profile.getName(),
                 profile.getAge(),
-                newPhotos.stream()
-                        .map(ProfilePhoto::getLink)
-                        .collect(Collectors.toList()),
+               newPhotos != null ?
+                        profile.getPhotos().stream()
+                                .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
+                                .collect(Collectors.toList()) :
+                        Collections.emptyList(),
                 profile.getCity(),
                 profile.getGender(),
                 newInterests.stream()

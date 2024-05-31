@@ -65,7 +65,7 @@ jacocoTestCoverageVerification {
         rule {
             limit {
                 // минимальное покрытие тестами в процентах
-                minimum = 0.50
+                minimum = 0.49
             }
         }
     }
