@@ -447,7 +447,7 @@ public class ProfileServiceImpl implements ProfileService {
                 profile.getId(),
                 profile.getName(),
                 profile.getAge(),
-               newPhotos != null ?
+                profile.getPhotos() != null ?
                         profile.getPhotos().stream()
                                 .flatMap(photo -> converter.convertProfilePhotosToMultipartFiles(profile.getPhotos()).stream())
                                 .collect(Collectors.toList()) :
