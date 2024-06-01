@@ -18,7 +18,12 @@ public class ProfilePhoto {
     private Long id;
 
 
-    private String link;
+    private String fileName;
+
+    private String fileType;
+
+    @Lob
+    private byte[] data;
 
     @JsonIgnore
     @ManyToOne

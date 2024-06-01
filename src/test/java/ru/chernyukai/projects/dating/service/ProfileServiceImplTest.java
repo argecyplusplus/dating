@@ -6,16 +6,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
+import ru.chernyukai.projects.dating.components.CustomMultipartFile;
 import ru.chernyukai.projects.dating.model.*;
 import ru.chernyukai.projects.dating.repository.InterestRepository;
 import ru.chernyukai.projects.dating.repository.MatchRepository;
 import ru.chernyukai.projects.dating.repository.PhotoRepository;
 import ru.chernyukai.projects.dating.repository.ProfileRepository;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -99,46 +101,30 @@ class ProfileServiceImplTest {
 
     @Test
     void getProfileById_ReturnsProfileInfoIfAccessible() {
-
+        // Setup security context
         Authentication authentication = mock(Authentication.class);
-        User user = new User();
-
-        user.setId(1L);
-        user.setUsername("testUser");
-        user.setPassword("password");
-        user.setExpired(false);
-        user.setLocked(false);
-        user.setEnabled(true);
-
-        List<UserRole> roles = new ArrayList<>();
-        UserRole role = new UserRole();
-        role.setId(1L);
-        role.setUserAuthority(UserAuthority.DEFAULT_USER);
-        role.setUser(user);
-        roles.add(role);
-        user.setUserRoles(roles);
-
+        User user = mock(User.class);
+        when(user.getId()).thenReturn(1L);
         when(authentication.getPrincipal()).thenReturn(user);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-
-        long myProfileId = 2L;
+        // Create profile
         Profile myProfile = new Profile();
-        myProfile.setId(myProfileId);
+        myProfile.setId(2L);
         myProfile.setVisible(true);
         myProfile.setGender("Мужской");
         myProfile.setCity("Москва");
         List<ProfilePhoto> myPhotos = new ArrayList<>();
-        myPhotos.add(new ProfilePhoto(null,"/fff/", myProfile));
+        myPhotos.add(new ProfilePhoto(null,"/fff/", "image/jpeg", new byte[]{}, myProfile));
         myProfile.setPhotos(myPhotos);
         List<Interest> myInterests = new ArrayList<>();
         myInterests.add(new Interest(null,InterestValue.ART, myProfile));
         myProfile.setInterests(myInterests);
+        when(profileRepository.getProfileByUser(any(User.class))).thenReturn(Optional.of(myProfile));
 
-
-        // Arrange
+        // Create expected profile
         long profileId = 1L;
         Profile expectedProfile = new Profile();
         expectedProfile.setId(profileId);
@@ -146,20 +132,19 @@ class ProfileServiceImplTest {
         expectedProfile.setCity("Москва");
         expectedProfile.setVisible(true);
         List<ProfilePhoto> photos = new ArrayList<>();
-        photos.add(new ProfilePhoto(null,"/fff/", expectedProfile));
+        photos.add(new ProfilePhoto(null,"/fff/", "image/jpeg", new byte[]{}, myProfile));
         expectedProfile.setPhotos(photos);
         List<Interest> interests = new ArrayList<>();
         interests.add(new Interest(null,InterestValue.ART, expectedProfile));
         expectedProfile.setInterests(interests);
-
-
-        when(profileRepository.getProfileByUser(user)).thenReturn(Optional.of(myProfile));
-
         when(profileRepository.getProfileById(profileId)).thenReturn(Optional.of(expectedProfile));
+
+        // Call service method
         Optional<ProfileInfo> profileInfoOptional = profileService.getProfileById(profileId);
 
+        // Verify result
         assertTrue(profileInfoOptional.isPresent());
-        assertEquals(expectedProfile.getId(), profileInfoOptional.get().getId());
+        assertEquals(profileId, profileInfoOptional.get().getId());
     }
 
     @Test
@@ -169,8 +154,8 @@ class ProfileServiceImplTest {
 
         when(profileService.userIsAdmin()).thenReturn(true);
 
-        List<String> photos = new ArrayList<>();
-        photos.add("/dd/");
+        List<MultipartFile> photos = new ArrayList<>();
+        photos.add(new CustomMultipartFile("photo1", "photo1.jpg", "image/jpeg", new byte[]{}));
         List<String> interests = new ArrayList<>();
         interests.add("Аниме");
 
@@ -241,7 +226,7 @@ class ProfileServiceImplTest {
     }
 
     @Test
-    void editOrCreateMyProfile_ReturnsEditedProfileInfo() {
+    void editOrCreateMyProfile_ReturnsEditedProfileInfo() throws IOException{
 
         ProfileInfo newProfile = new ProfileInfo();
         newProfile.setName("New Test Profile");
@@ -293,12 +278,12 @@ class ProfileServiceImplTest {
     }
 
     @Test
-    void updatePhotos_ReturnsNewPhotos() {
+    void updatePhotos_ReturnsNewPhotos() throws IOException {
         Profile profile = new Profile();
         when(profileRepository.findById(anyLong())).thenReturn(Optional.of(profile));
         when(photoRepository.save(any())).thenReturn(new ProfilePhoto());
 
-        List<ProfilePhoto> newPhotos = profileService.updatePhotos(profile.getId(), new ArrayList<String>());
+        List<ProfilePhoto> newPhotos = profileService.updatePhotos(profile.getId(), new ArrayList<MultipartFile>());
 
         assertNotNull(newPhotos);
     }
