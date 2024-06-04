@@ -6,9 +6,6 @@ import lombok.*;
 
 import java.util.List;
 
-import ru.chernyukai.projects.dating.model.ProfilePhoto;
-import ru.chernyukai.projects.dating.model.Interest;
-
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor

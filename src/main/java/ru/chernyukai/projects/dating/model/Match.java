@@ -7,8 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
-@Getter //Генерируем геттеры
-@Setter //Генерируем сеттеры
+@Getter
+@Setter
 @ToString
 @Entity(name = "matches")
 @Table(name = "matches")
